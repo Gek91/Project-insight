@@ -1,0 +1,21 @@
+<div *ngIf="team != null">
+    <mat-card class="mat-elevation-z3">
+        <mat-card-header>
+            <mat-card-title>Team</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            Project Manager:
+            <ul>
+                <li *ngFor="let manager of team.projectManager">{{manager.name}}</li>
+            </ul> 
+            Tech Lead:
+            <ul>
+                <li *ngFor="let lead of team.techLead">{{lead.name}}</li>
+            </ul>
+            Developers:
+            <ul>
+                <li *ngFor="let developer of team.developers">{{developer.name}}</li>
+            </ul> 
+        </mat-card-content>
+    </mat-card>
+</div>

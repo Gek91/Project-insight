@@ -1,0 +1,28 @@
+
+<table mat-table [dataSource]="versionHistory$" class="mat-elevation-z3">
+
+    <ng-container matColumnDef="releaseDate">
+        <th mat-header-cell *matHeaderCellDef> Release Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.releaseDate | date: 'dd-MM-yyyy'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="version">
+        <th mat-header-cell *matHeaderCellDef> Version </th>
+        <td mat-cell *matCellDef="let element"> {{element.majorVersion}}.{{element.minorVersion}}.{{element.patchVersion}} 
+            <span *ngIf=element.versionLabel>({{element.versionLabel}})</span> </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <td mat-cell *matCellDef="let element"> {{ PROJECT_VERSION_STATUS_LABEL[element.statusId] }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="note">
+        <th mat-header-cell *matHeaderCellDef> Note </th>
+        <td mat-cell *matCellDef="let element"> {{element.note}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['releaseDate','version', 'status','note']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['releaseDate','version', 'status','note'];"></tr>
+
+</table>

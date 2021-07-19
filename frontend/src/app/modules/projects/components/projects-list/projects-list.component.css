@@ -1,0 +1,7 @@
+table {
+    width: 70%;
+  }
+
+.mat-row:hover .mat-cell {
+  border-color: currentColor;
+}

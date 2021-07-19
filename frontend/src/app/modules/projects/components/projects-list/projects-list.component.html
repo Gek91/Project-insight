@@ -1,0 +1,24 @@
+
+<table mat-table [dataSource]="projects$" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="version">
+        <th mat-header-cell *matHeaderCellDef> Version </th>
+        <td mat-cell *matCellDef="let element"> {{element.lastVersion.majorVersion}}.{{element.lastVersion.minorVersion}}.{{element.lastVersion.patchVersion}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="releaseDate">
+        <th mat-header-cell *matHeaderCellDef> Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.lastVersion.releaseDate | date: 'dd-MM-yyyy'}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['name','version','releaseDate']"></tr>
+    <tr mat-row 
+    (click)="this.router.navigateByUrl('/projects/'+ row.id)"
+    *matRowDef="let row; columns: ['name','version','releaseDate'];"></tr>
+</table>
+
