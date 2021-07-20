@@ -6,15 +6,15 @@
         <mat-card-content>
             Project Manager:
             <ul>
-                <li *ngFor="let manager of team.projectManager">{{manager.name}}</li>
+                <li *ngFor="let manager of team.projectManager">{{manager.name}} {{manager.surname}}</li>
             </ul> 
             Tech Lead:
             <ul>
-                <li *ngFor="let lead of team.techLead">{{lead.name}}</li>
+                <li *ngFor="let lead of team.techLead">{{lead.name}} {{lead.surname}}</li>
             </ul>
             Developers:
             <ul>
-                <li *ngFor="let developer of team.developers">{{developer.name}}</li>
+                <li *ngFor="let developer of team.developers">{{developer.name}} {{developer.surname}}</li>
             </ul> 
         </mat-card-content>
     </mat-card>

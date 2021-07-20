@@ -5,6 +5,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatTableModule} from '@angular/material/table';
+import {MatCardModule} from '@angular/material/card';
+import { CustomersModule } from './modules/customers/customers.module';
+
 
 @NgModule({
   declarations: [
@@ -15,7 +20,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserModule,
     AppRoutingModule,
     ProjectsModule,
-    BrowserAnimationsModule
+    CustomersModule,
+    BrowserAnimationsModule,
+    MatTabsModule
+  ],
+  exports: [
+    MatTabsModule,
+    MatTableModule,
+    MatCardModule
   ],
   providers: [],
   bootstrap: [AppComponent]

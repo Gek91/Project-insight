@@ -1,4 +1,5 @@
-import { Customer, CustomerDeserializer } from "./Customer";
+import { NonNullAssert } from "@angular/compiler";
+import { Customer, CustomerDeserializer, CustomerSimple } from "../../customers/model/Customer";
 import { ProjectVersion, ProjectVersionDeserializer, ProjectVersionSimple } from "./ProjectVersion";
 import { Team, TeamDeserializer } from "./Team";
 
@@ -7,10 +8,10 @@ export interface Project{
     id: string;
     name: string;
     description: string,
-    customer: Customer,
+    customer: CustomerSimple,
     creationInstant: Date,
     lastUpdateInstant: Date
-    lastVersion: ProjectVersionSimple
+    lastVersion: ProjectVersionSimple | null
 }
 
 export interface ProjectDetail {
@@ -18,7 +19,7 @@ export interface ProjectDetail {
     id: string;
     name: string;
     description: string,
-    customer: Customer,
+    customer: CustomerSimple,
     creationInstant: Date,
     lastUpdateInstant: Date
     team: Team;
@@ -28,7 +29,7 @@ export interface ProjectDetail {
 export class ProjectDeserializer {
 
     public static fromProjectList = (value : any) : Project[] => (
-        value.projects?.map( 
+        value?.map( 
             (val: any) => ProjectDeserializer.fromProjectListElement(val)
         )
     );
@@ -39,9 +40,9 @@ export class ProjectDeserializer {
             name: value.name,
             description: value.description,
             customer: CustomerDeserializer.fromCustomerSimple(value.customer),
-            creationInstant: value.creationInstant,
-            lastUpdateInstant: value.lastUpdateInstant,
-            lastVersion: ProjectVersionDeserializer.fromProjectVersionSimple(value.lastProjectVersion)
+            creationInstant: new Date(value.creationInstant),
+            lastUpdateInstant: new Date(value.lastUpdateInstant),
+            lastVersion: value.lastProjectVersion != null ? ProjectVersionDeserializer.fromProjectVersionSimple(value.lastProjectVersion) : null
         }
     );
 
@@ -51,8 +52,8 @@ export class ProjectDeserializer {
             name: value.name,
             description: value.description,
             customer: CustomerDeserializer.fromCustomerSimple(value.customer),
-            creationInstant: value.creationInstant,
-            lastUpdateInstant: value.lastUpdateInstant,
+            creationInstant: new Date(value.creationInstant),
+            lastUpdateInstant: new Date(value.lastUpdateInstant),
             team: TeamDeserializer.fromTeam(value.team),
             versions: ProjectVersionDeserializer.fromProjectVersionList(value.versions)
         }

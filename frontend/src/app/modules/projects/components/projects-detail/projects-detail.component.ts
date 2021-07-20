@@ -21,13 +21,12 @@ export class ProjectsDetailComponent implements OnInit {
   ngOnInit(): void {
 
     const id : string | null = this.route.snapshot.paramMap.get('projectId'); 
+
     if(id) {
       this.projectsService.getProjectDetail(id)
       .subscribe(
-          project => this.detail = project
-        );
-    }
-    
+        project => this.detail = project
+      );
+    } 
   }
-
 }

@@ -6,15 +6,15 @@ import { ProjectsDetailComponent } from './components/projects-detail/projects-d
 import { ProjectsRoutingModule } from './projects-routing.module';
 import { TeamDetailComponent } from './components/team-detail/team-detail.component';
 import { ProjectVersionHistoryComponent } from './components/project-version-history/project-version-history.component';
-import {MatTableModule} from '@angular/material/table';
-import {MatCardModule} from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [
     ProjectsListComponent,
     ProjectsDetailComponent,
     TeamDetailComponent,
-    ProjectVersionHistoryComponent
+    ProjectVersionHistoryComponent,
   ],
   imports: [
     CommonModule,
@@ -24,9 +24,7 @@ import {MatCardModule} from '@angular/material/card';
     MatCardModule
   ],
   exports: [
-    ProjectsListComponent,
-    MatTableModule,
-    MatCardModule
+        
   ]
 })
 export class ProjectsModule { }

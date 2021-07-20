@@ -13,10 +13,10 @@ public interface ProjectRestApi {
 
   @GET
   @Path("/")
-  public ProjectListDTO getProjectList();
+  ProjectListDTO getProjectList();
 
   @GET
   @Path("/{id}")
-  public ProjectDetailDTO getProjectDetail(@PathParam("id") String id);
+  ProjectDetailDTO getProjectDetail(@PathParam("id") String id);
 
 }

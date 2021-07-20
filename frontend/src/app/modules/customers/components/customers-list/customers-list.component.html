@@ -1,0 +1,15 @@
+
+<mat-grid-list cols="5">
+    <mat-grid-tile *ngFor="let customer of customers$ | async">
+        <mat-card class="mat-elevation-z3" (click)="this.router.navigateByUrl('/customers/'+ customer.id)"> 
+            <mat-card-header>
+                <mat-card-title>{{customer.name}}</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                ...
+            </mat-card-content>
+        </mat-card>
+    </mat-grid-tile>
+
+</mat-grid-list>
+

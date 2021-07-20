@@ -9,7 +9,7 @@ import projectTemplate.module.project.domain.project.repository.ProjectRepositor
 import projectTemplate.module.project.persistence.customer.CustomerRepositoryImpl;
 import projectTemplate.module.project.persistence.employee.EmployeeRepositoryImpl;
 import projectTemplate.module.project.persistence.project.ProjectRespositoryImpl;
-import projectTemplate.module.project.rest.TestRestApiImpl;
+import projectTemplate.module.project.rest.customer.CustomerRestApiImpl;
 import projectTemplate.module.project.rest.project.ProjectRestApiImpl;
 
 public class ProjectGuiceModule extends AbstractModule {
@@ -20,6 +20,7 @@ public class ProjectGuiceModule extends AbstractModule {
 
 	  //Rest API
 	  bind(ProjectRestApiImpl.class);
+	  bind(CustomerRestApiImpl.class);
 
 	  //Services
 

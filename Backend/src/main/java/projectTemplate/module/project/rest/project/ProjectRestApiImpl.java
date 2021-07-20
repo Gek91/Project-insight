@@ -32,13 +32,13 @@ public class ProjectRestApiImpl extends BaseRestApiImpl implements ProjectRestAp
   @Override
   public ProjectListDTO getProjectList() {
 
-    ProjectListDTO response = new ProjectListDTO();
+    ProjectListDTO response = null;
 
     try {
 
       persistenceService.beginJdbcTransaction();
 
-      List<Project> projects = projectRepository.search();
+      List<Project> projects = projectRepository.search(null);
 
       response = ProjectListDTO.buildDTO(
         projects,

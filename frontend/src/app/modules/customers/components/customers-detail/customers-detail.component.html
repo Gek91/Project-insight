@@ -1,15 +1,12 @@
 
 <mat-card *ngIf="detail != null" class="mat-elevation-z3">
+
     <mat-card-header>
         <mat-card-title>{{detail.name}}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
         <p>Last Update: <b>{{detail.lastUpdateInstant | date : 'dd-MM-yyyy'}}</b></p>
-        <p>Customer: <b>{{detail.customer.name}}</b></p>
     </mat-card-content>
+    <app-customer-project-list [projects]="detail.projects"></app-customer-project-list>
 
-    <app-team-detail [team]="detail.team"></app-team-detail>
-    <app-project-version-history [versions]="detail.versions"></app-project-version-history>
-    
 </mat-card>
-    

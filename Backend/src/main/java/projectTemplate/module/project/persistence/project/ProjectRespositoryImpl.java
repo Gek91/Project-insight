@@ -1,10 +1,12 @@
 package projectTemplate.module.project.persistence.project;
 
 import com.google.inject.Inject;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import projectTemplate.module.app.service.PersistenceService;
 import projectTemplate.module.project.domain.project.repository.ProjectRepository;
 import projectTemplate.module.project.domain.project.model.Project;
 import projectTemplate.module.project.domain.project.model.ProjectVersion;
+import projectTemplate.module.project.domain.project.repository.data.ProjectSearchOptions;
 import projectTemplate.module.project.persistence.employee.EmployeeRoleEnum;
 
 import java.sql.Connection;
@@ -18,6 +20,18 @@ public class ProjectRespositoryImpl implements ProjectRepository {
   @Inject
   private PersistenceService persistenceService;
 
+  @Override
+  public Project findForRead(String id) {
+
+    String query = "" +
+      "SELECT * " +
+      "FROM project " +
+      "WHERE project.deleted = false " +
+      "AND project.id = ? ";
+    // "FOR SHARE ; ";
+
+    return find(id, query);
+  }
 
   @Override
   public Project findForUpdate(String id) {
@@ -58,9 +72,7 @@ public class ProjectRespositoryImpl implements ProjectRepository {
               .setVersionsData(versions).buildProject();
           }
         }
-
       }
-
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -146,22 +158,9 @@ public class ProjectRespositoryImpl implements ProjectRepository {
   }
 
   @Override
-  public Project findForRead(String id) {
+  public List<Project> search(ProjectSearchOptions options) {
 
-    String query = "" +
-      "SELECT * " +
-      "FROM project " +
-      "WHERE project.deleted = false " +
-      "AND project.id = ? ";
-     // "FOR SHARE ; ";
-
-    return find(id, query);
-  }
-
-  @Override
-  public List<Project> search() {
-
-    List<Project> projects = new ArrayList<>();
+    List<Project> result = new ArrayList<>();
 
     try (Connection connection = persistenceService.getConnection()) {
 
@@ -169,10 +168,19 @@ public class ProjectRespositoryImpl implements ProjectRepository {
         "SELECT * " +
         "FROM project " +
         "WHERE deleted = false " +
+        "${filterOptionPlaceHolder} " +
         "ORDER BY creation_instant DESC";
 
-      try (PreparedStatement statement = connection.prepareStatement(query)) {
+      Map<Integer, Object> parameterNameValueMaps = new HashMap<>();
+      Map<String, String> sqlQueryPlaceHolderParams = new HashMap<>();
+      sqlQueryPlaceHolderParams.put("filterOptionPlaceHolder", buildFilterOptionClausole(options, parameterNameValueMaps));
 
+      try (PreparedStatement statement = connection.prepareStatement(
+        StrSubstitutor.replace(query, sqlQueryPlaceHolderParams))) {
+
+        for (Map.Entry<Integer, Object> integerObjectEntry : parameterNameValueMaps.entrySet()) {
+          statement.setObject(integerObjectEntry.getKey(), integerObjectEntry.getValue());
+        }
         statement.execute();
 
         try (ResultSet resultSet = statement.getResultSet()) {
@@ -188,7 +196,7 @@ public class ProjectRespositoryImpl implements ProjectRepository {
 
           projectMapperMap.entrySet().forEach(entry -> {
 
-            projects.add(entry.getValue()
+            result.add(entry.getValue()
               .setTeamMemberData(projectEmployeeMap.get(entry.getKey()))
               .setVersionsData(projectVersionsMap.get(entry.getKey()))
               .buildProject()
@@ -201,7 +209,27 @@ public class ProjectRespositoryImpl implements ProjectRepository {
       throw new RuntimeException(e);
     }
 
-    return projects;
+    return result;
+  }
+
+  private String buildFilterOptionClausole(ProjectSearchOptions options, Map<Integer, Object> parameterNameValueMaps) {
+
+    StringBuilder stringBuilder = new StringBuilder(" ");
+
+    if(options != null) {
+
+      int index = 1;
+
+      if(options.getCustomerId() != null) {
+
+        stringBuilder.append("AND customer_id = ? ");
+        parameterNameValueMaps.put(index, options.getCustomerId());
+
+        index++;
+      }
+    }
+
+    return stringBuilder.toString();
   }
 
   @Override

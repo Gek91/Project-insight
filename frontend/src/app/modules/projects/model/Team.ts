@@ -1,10 +1,10 @@
-import { Customer } from "./Customer";
+import { Employee } from "./Employee";
 
 export interface Team {
 
-    projectManager: Customer[];
-    techLead: Customer[];
-    developers: Customer[];
+    projectManager: Employee[];
+    techLead: Employee[];
+    developers: Employee[];
 }
 
 export class TeamDeserializer {

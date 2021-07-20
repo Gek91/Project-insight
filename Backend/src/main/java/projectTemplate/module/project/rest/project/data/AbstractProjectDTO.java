@@ -13,8 +13,8 @@ public abstract class AbstractProjectDTO {
   private String name;
   private String description;
   private CustomerSimpleDTO customer;
-  private Instant creationInstant;
-  private Instant lastUpdateInstant;
+  private long creationInstant;
+  private long lastUpdateInstant;
 
   public String getId() {
     return id;
@@ -40,26 +40,25 @@ public abstract class AbstractProjectDTO {
   public void setCustomer(CustomerSimpleDTO customer) {
     this.customer = customer;
   }
-  public Instant getCreationInstant() {
+  public long getCreationInstant() {
     return creationInstant;
   }
-  public void setCreationInstant(Instant creationInstant) {
+  public void setCreationInstant(long creationInstant) {
     this.creationInstant = creationInstant;
   }
-  public Instant getLastUpdateInstant() {
+  public long getLastUpdateInstant() {
     return lastUpdateInstant;
   }
-  public void setLastUpdateInstant(Instant lastUpdateInstant) {
+  public void setLastUpdateInstant(long lastUpdateInstant) {
     this.lastUpdateInstant = lastUpdateInstant;
   }
 
   protected static void populateDTOFields(AbstractProjectDTO output, Project input, Map<String, Customer> customerMap) {
-    output.setCreationInstant(input.getCreationInstant());
     output.setCustomer(CustomerSimpleDTO.buildDTO(customerMap.get(input.getCustomerId())));
     output.setDescription(input.getDescription());
     output.setId(input.getId());
     output.setName(input.getName());
-    output.setCreationInstant(input.getCreationInstant());
-    output.setLastUpdateInstant(input.getLastUpdateInstant());
+    output.setCreationInstant(input.getCreationInstant().toEpochMilli());
+    output.setLastUpdateInstant(input.getLastUpdateInstant().toEpochMilli());
   }
 }

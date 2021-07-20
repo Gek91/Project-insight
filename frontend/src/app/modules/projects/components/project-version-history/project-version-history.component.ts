@@ -16,7 +16,7 @@ export class ProjectVersionHistoryComponent implements OnInit {
   public readonly PROJECT_VERSION_STATUS_LABEL : {[key: string]: string} = ProjectVersionStatusLabelMap;
 
 
-  constructor(private projectsService: ProjectsService) {
+  constructor() {
    }
 
   ngOnInit(): void {

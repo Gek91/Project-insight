@@ -9,7 +9,6 @@ export const routes: Routes = [
         path: '',  children: [
             { path: 'projects', component: ProjectsListComponent },
             { path: 'projects/:projectId', component: ProjectsDetailComponent },
-            { path: '**', redirectTo: 'projects' }
         ]
     }
 ];
