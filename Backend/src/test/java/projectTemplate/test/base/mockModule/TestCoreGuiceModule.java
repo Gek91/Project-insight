@@ -2,8 +2,8 @@ package projectTemplate.test.base.mockModule;
 
 import com.google.inject.AbstractModule;
 
-import projectTemplate.module.app.service.PropertiesService;
-import projectTemplate.module.app.service.impl.PropertiesServiceImpl;
+import projectinsight.module.app.service.PropertiesService;
+import projectinsight.module.app.service.impl.PropertiesServiceImpl;
 
 public class TestCoreGuiceModule extends AbstractModule {
 

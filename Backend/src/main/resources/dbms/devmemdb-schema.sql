@@ -5,6 +5,7 @@
 CREATE TABLE `customer` (
   `id` VARCHAR(100) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
+  `version` INT NOT NULL,
   `creation_instant` DATETIME(3) NOT NULL,
   `last_update_instant` DATETIME(3) NOT NULL,
   `deleted` BOOLEAN NOT NULL,

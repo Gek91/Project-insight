@@ -2,11 +2,11 @@
 -- Local dev database data
 
 INSERT INTO `customer`
-	(`id`, `name`, 	  `creation_instant`,     `last_update_instant`, `deleted`)
+	(`id`, `name`,        `version`,  `creation_instant`,     `last_update_instant`, `deleted`)
 VALUES
-	('1',		'Customer1',	'2021-01-01 00:00:00',  '2021-01-01 00:00:00',  0),
-	('2',		'Customer2',	'2021-01-02 00:00:00',  '2021-01-02 00:00:00',  0),
-	('3',		'Customer3',	'2021-01-03 00:00:00',  '2021-01-03 00:00:00',  0);
+	('1',		'Customer1',	0,          '2021-01-01 00:00:00',  '2021-01-01 00:00:00',  0),
+	('2',		'Customer2',	0,          '2021-01-02 00:00:00',  '2021-01-02 00:00:00',  0),
+	('3',		'Customer3',	0,          '2021-01-03 00:00:00',  '2021-01-03 00:00:00',  0);
 
 INSERT INTO `employee`
   (`id`,  `name`,       `surname`,      `creation_instant`,       `last_update_instant`,    `deleted`)

@@ -20,7 +20,6 @@ export class ProjectVersionHistoryComponent implements OnInit {
    }
 
   ngOnInit(): void {
-    console.log(this.versions);
     if(this.versions != null) {
       this.versionHistory$ = of(this.versions);
     }

@@ -1,18 +1,15 @@
 package projectTemplate.test.module.project;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.google.inject.AbstractModule;
 import org.junit.Assert;
 import org.junit.Test;
-import projectTemplate.module.app.commons.UIIDGenerator;
-import projectTemplate.module.project.ProjectGuiceModule;
-import projectTemplate.module.project.domain.project.model.Project;
-import projectTemplate.module.project.domain.project.model.ProjectBuilder;
+import projectinsight.module.app.commons.UIIDGenerator;
+import projectinsight.module.project.ProjectGuiceModule;
+import projectinsight.module.project.domain.project.model.Project;
+import projectinsight.module.project.domain.project.model.ProjectBuilder;
 import projectTemplate.test.base.BaseUnitTest;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 public class ProjectTest extends BaseUnitTest {
 

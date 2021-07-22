@@ -5,23 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.junit.After;
 import org.junit.Before;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 
-import projectTemplate.module.app.AppGuiceModule;
-import projectTemplate.module.app.commons.AppRuntimeEnvironment;
-import projectTemplate.module.app.commons.ConnectionProxy;
-import projectTemplate.module.app.commons.RequestContextData;
-import projectTemplate.module.project.domain.employee.EmployeeRepository;
-
-import javax.sql.DataSource;
+import projectinsight.module.app.AppGuiceModule;
+import projectinsight.module.app.commons.AppRuntimeEnvironment;
+import projectinsight.module.app.commons.ConnectionProxy;
+import projectinsight.module.app.commons.RequestContextData;
 
 public abstract class BaseUnitTest extends BaseTest {
 

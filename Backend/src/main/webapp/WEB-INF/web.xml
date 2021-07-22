@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1"
          metadata-complete="true">
-          
+
  	<!-- Define the runtime enviroment. The value is taken from POM -->
 	<context-param>
 		<param-name>application.project.runtime.environment</param-name>
@@ -12,22 +12,22 @@
 	</context-param>
 
 	<listener>
-		<listener-class>projectTemplate.module.app.commons.ApplicationModulesLoaderContextListener</listener-class>
+		<listener-class>projectinsight.module.app.commons.ApplicationModulesLoaderContextListener</listener-class>
 	</listener>
-	
+
 	<context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
 		<param-value>/api</param-value>
 	</context-param>
-  
+
 	<servlet>
 		<servlet-name>Resteasy</servlet-name>
 		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>Resteasy</servlet-name>
 		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
-  
+
 </web-app>
