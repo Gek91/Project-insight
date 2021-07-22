@@ -5,7 +5,7 @@ import projectinsight.module.app.commons.UIIDGenerator;
 import projectinsight.module.app.commons.validations.ValidationErrorTypeEnum;
 import projectinsight.module.app.commons.validations.ValidationManager;
 import projectinsight.module.project.domain.customer.model.Customer;
-import projectinsight.module.project.domain.customer.CustomerRepository;
+import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.employee.model.Employee;
 import projectinsight.module.project.domain.employee.EmployeeRepository;
 

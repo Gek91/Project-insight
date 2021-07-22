@@ -2,82 +2,129 @@ package projectinsight.module.project.persistence.project;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.text.StrSubstitutor;
+import projectinsight.module.app.commons.uow.RepositoryAbstractImpl;
 import projectinsight.module.app.service.PersistenceService;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.model.ProjectVersion;
-import projectinsight.module.project.domain.project.repository.data.ProjectSearchOptions;
+import projectinsight.module.project.domain.project.repository.ProjectSearchOptions;
 import projectinsight.module.project.persistence.employee.EmployeeRoleEnum;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProjectRespositoryImpl implements ProjectRepository {
+public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Project, ProjectSearchOptions> implements ProjectRepository {
 
   @Inject
   private PersistenceService persistenceService;
 
   @Override
-  public Project findForRead(String id) {
-
-    String query = "" +
+  protected String getFindForReadQuery() {
+    return "" +
       "SELECT * " +
       "FROM project " +
       "WHERE project.deleted = false " +
       "AND project.id = ? ";
     // "FOR SHARE ; ";
-
-    return find(id, query);
   }
 
   @Override
-  public Project findForUpdate(String id) {
-
-    String query = "" +
+  protected String getFindForUpdateQuery() {
+    return "" +
       "SELECT * " +
       "FROM project " +
       "WHERE project.deleted = false " +
       "AND project.id = ? " +
       "FOR UPDATE ";
-
-    return find(id, query);
   }
 
-  private Project find(String id, String query) {
+  @Override
+  protected String getSearchQuery() {
+    return "SELECT * " +
+      "FROM project " +
+      "WHERE deleted = false " +
+      "${filterOptionPlaceHolder} " +
+      "ORDER BY creation_instant DESC";
+  }
 
-    Project result = null;
+  @Override
+  protected String buildFilterOptionClause(ProjectSearchOptions options, Map<Integer, Object> parameterNameValueMaps) {
 
-    try (Connection connection = persistenceService.getConnection()) {
+    StringBuilder stringBuilder = new StringBuilder(" ");
 
-      try (PreparedStatement statement = connection.prepareStatement(query)) {
+    if(options != null) {
 
-        statement.setString(1, id);
-        statement.execute();
+      int index = 1;
 
-        try (ResultSet resultSet = statement.getResultSet()) {
+      if(options.getCustomerId() != null) {
 
-          if (resultSet.next()) {
+        stringBuilder.append("AND customer_id = ? ");
+        parameterNameValueMaps.put(index, options.getCustomerId());
 
-            String projectId = resultSet.getString("id");
-
-            Map<EmployeeRoleEnum, List<String>> teamMemberMap = retrieveProjectsTeamMember(Collections.singleton(projectId)).get(projectId);
-            List<ProjectVersion> versions = retrieveProjectsVersions(Collections.singleton(projectId)).get(projectId);
-
-            result = new ProjectMapper()
-              .setResultSetData(resultSet)
-              .setTeamMemberData(teamMemberMap)
-              .setVersionsData(versions).buildProject();
-          }
-        }
+        index++;
       }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
 
+    return stringBuilder.toString();
+  }
+
+  @Override
+  protected Project buildSingleEntityFromResultSet(ResultSet resultSet) throws SQLException {
+
+    String projectId = resultSet.getString("id");
+
+    Map<EmployeeRoleEnum, List<String>> teamMemberMap = retrieveProjectsTeamMember(Collections.singleton(projectId)).get(projectId);
+    List<ProjectVersion> versions = retrieveProjectsVersions(Collections.singleton(projectId)).get(projectId);
+
+    return new ProjectMapper()
+      .setResultSetData(resultSet)
+      .setTeamMemberData(teamMemberMap)
+      .setVersionsData(versions).buildProject();
+  }
+
+  @Override
+  protected List<Project> buildListEntitiesFromResultSet(ResultSet resultSet) throws SQLException {
+
+    List<Project> result = new ArrayList<>();
+
+    Map<String, ProjectMapper> projectMapperMap = new HashMap<>();
+    while (resultSet.next()) {
+      String projectId = resultSet.getString("id");
+      projectMapperMap.put(projectId, new ProjectMapper().setResultSetData(resultSet));
+    }
+
+    Map<String, Map<EmployeeRoleEnum, List<String>>> projectEmployeeMap = retrieveProjectsTeamMember(projectMapperMap.keySet());
+    Map<String, List<ProjectVersion>> projectVersionsMap = retrieveProjectsVersions(projectMapperMap.keySet());
+
+    projectMapperMap.entrySet().forEach(entry -> {
+
+      result.add(entry.getValue()
+        .setTeamMemberData(projectEmployeeMap.get(entry.getKey()))
+        .setVersionsData(projectVersionsMap.get(entry.getKey()))
+        .buildProject()
+      );
+    });
+
     return result;
+  }
+
+  @Override
+  protected void applyAdd(Project entity) {
+
+  }
+
+  @Override
+  protected boolean applyUpdate(Project entity) {
+    return false;
+  }
+
+  @Override
+  protected void applyRemove(Project entity) {
+
   }
 
   private Map<String, Map<EmployeeRoleEnum, List<String>>> retrieveProjectsTeamMember(Set<String> projectsIds) {
@@ -155,91 +202,6 @@ public class ProjectRespositoryImpl implements ProjectRepository {
       }
     }
     return result;
-  }
-
-  @Override
-  public List<Project> search(ProjectSearchOptions options) {
-
-    List<Project> result = new ArrayList<>();
-
-    try (Connection connection = persistenceService.getConnection()) {
-
-      String query = "" +
-        "SELECT * " +
-        "FROM project " +
-        "WHERE deleted = false " +
-        "${filterOptionPlaceHolder} " +
-        "ORDER BY creation_instant DESC";
-
-      Map<Integer, Object> parameterNameValueMaps = new HashMap<>();
-      Map<String, String> sqlQueryPlaceHolderParams = new HashMap<>();
-      sqlQueryPlaceHolderParams.put("filterOptionPlaceHolder", buildFilterOptionClausole(options, parameterNameValueMaps));
-
-      try (PreparedStatement statement = connection.prepareStatement(
-        StrSubstitutor.replace(query, sqlQueryPlaceHolderParams))) {
-
-        for (Map.Entry<Integer, Object> integerObjectEntry : parameterNameValueMaps.entrySet()) {
-          statement.setObject(integerObjectEntry.getKey(), integerObjectEntry.getValue());
-        }
-        statement.execute();
-
-        try (ResultSet resultSet = statement.getResultSet()) {
-
-          Map<String, ProjectMapper> projectMapperMap = new HashMap<>();
-          while (resultSet.next()) {
-            String projectId = resultSet.getString("id");
-            projectMapperMap.put(projectId, new ProjectMapper().setResultSetData(resultSet));
-          }
-
-          Map<String, Map<EmployeeRoleEnum, List<String>>> projectEmployeeMap = retrieveProjectsTeamMember(projectMapperMap.keySet());
-          Map<String, List<ProjectVersion>> projectVersionsMap = retrieveProjectsVersions(projectMapperMap.keySet());
-
-          projectMapperMap.entrySet().forEach(entry -> {
-
-            result.add(entry.getValue()
-              .setTeamMemberData(projectEmployeeMap.get(entry.getKey()))
-              .setVersionsData(projectVersionsMap.get(entry.getKey()))
-              .buildProject()
-              );
-          });
-        }
-      }
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
-    return result;
-  }
-
-  private String buildFilterOptionClausole(ProjectSearchOptions options, Map<Integer, Object> parameterNameValueMaps) {
-
-    StringBuilder stringBuilder = new StringBuilder(" ");
-
-    if(options != null) {
-
-      int index = 1;
-
-      if(options.getCustomerId() != null) {
-
-        stringBuilder.append("AND customer_id = ? ");
-        parameterNameValueMaps.put(index, options.getCustomerId());
-
-        index++;
-      }
-    }
-
-    return stringBuilder.toString();
-  }
-
-  @Override
-  public void add(Project project) {
-
-  }
-
-  @Override
-  public void remove(String id) {
-
   }
 
 }

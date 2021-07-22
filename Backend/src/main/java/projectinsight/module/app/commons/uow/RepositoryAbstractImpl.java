@@ -1,19 +1,20 @@
 package projectinsight.module.app.commons.uow;
 
 import com.google.inject.Inject;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import projectinsight.module.app.service.PersistenceService;
-import projectinsight.module.project.domain.customer.model.Customer;
-import projectinsight.module.project.persistence.customer.CustomerMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public abstract class RepositoryAbstractImpl<K, T extends Entity<K>> implements Repository {
+public abstract class RepositoryAbstractImpl<K, T extends Entity<K>, W extends SearchOptions> implements Repository {
 
   @Inject
   protected PersistenceService persistenceService;
@@ -23,7 +24,9 @@ public abstract class RepositoryAbstractImpl<K, T extends Entity<K>> implements 
   protected abstract String getFindForReadQuery();
   protected abstract String getFindForUpdateQuery();
   protected abstract String getSearchQuery();
-  protected abstract T buildEntityFromResultSet(ResultSet resultSet);
+  protected abstract String buildFilterOptionClause(W options, Map<Integer, Object> parameterNameValueMaps);
+  protected abstract T buildSingleEntityFromResultSet(ResultSet resultSet) throws SQLException;
+  protected abstract List<T> buildListEntitiesFromResultSet(ResultSet resultSet) throws SQLException;
 
   protected abstract void applyAdd(T entity);
   protected abstract boolean applyUpdate(T entity);
@@ -75,7 +78,7 @@ public abstract class RepositoryAbstractImpl<K, T extends Entity<K>> implements 
 
           if (resultSet.next()) {
 
-            result = buildEntityFromResultSet(resultSet);
+            result = buildSingleEntityFromResultSet(resultSet);
 
             this.entities.get(OperationEnum.GET).put(result.getId(), result);
           }
@@ -88,24 +91,29 @@ public abstract class RepositoryAbstractImpl<K, T extends Entity<K>> implements 
     return result;
   }
 
-  public List<T> search() {
+  public List<T> search(W options) {
 
     List<T> result = new ArrayList<>();
 
     try (Connection connection = persistenceService.getConnection()) {
 
       String query = getSearchQuery();
+      Map<Integer, Object> parameterNameValueMaps = new HashMap<>();
+      Map<String, String> sqlQueryPlaceHolderParams = new HashMap<>();
+      sqlQueryPlaceHolderParams.put("filterOptionPlaceHolder", buildFilterOptionClause(options, parameterNameValueMaps));
 
-      try (PreparedStatement statement = connection.prepareStatement(query)) {
+      try (PreparedStatement statement = connection.prepareStatement(StrSubstitutor.replace(query, sqlQueryPlaceHolderParams))) {
 
+        for (Map.Entry<Integer, Object> integerObjectEntry : parameterNameValueMaps.entrySet()) {
+          statement.setObject(integerObjectEntry.getKey(), integerObjectEntry.getValue());
+        }
         statement.execute();
 
         try (ResultSet resultSet = statement.getResultSet()) {
-          while (resultSet.next()) {
-            T entity = buildEntityFromResultSet(resultSet);
-            result.add(entity);
-            this.entities.get(OperationEnum.GET).put(entity.getId(), entity);
-          }
+
+          result.addAll(buildListEntitiesFromResultSet(resultSet));
+
+          this.entities.get(OperationEnum.GET).putAll(result.stream().collect(Collectors.toMap(x -> x.getId(), x -> x)));
         }
       }
     } catch (Exception e) {

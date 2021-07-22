@@ -1,11 +1,8 @@
 package projectinsight.module.app.commons.uow;
 
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import projectinsight.module.app.service.PersistenceService;
-import projectinsight.module.project.domain.customer.CustomerRepository;
-import projectinsight.module.project.domain.customer.model.Customer;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,9 +21,9 @@ public class UnitOfWork {
   private Map<Class, Repository> repositories;
 
   //TODO rendere più esplicita la necessità di far partire la transizione da begin (evitare due step creazione e begin)
-  protected UnitOfWork(PersistenceService persistenceService, CustomerRepository customerRepository) {
-    repositories = new HashMap<>();
-    repositories.put(Customer.class, customerRepository);
+  protected UnitOfWork(PersistenceService persistenceService, Map<Class, Repository> repositories) {
+    this.repositories = new HashMap<>();
+    this.repositories.putAll(repositories);
 
     this.persistenceService = persistenceService;
   }

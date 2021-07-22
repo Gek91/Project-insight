@@ -1,6 +1,8 @@
-package projectinsight.module.project.domain.project.repository.data;
+package projectinsight.module.project.domain.project.repository;
 
-public class ProjectSearchOptions {
+import projectinsight.module.app.commons.uow.SearchOptions;
+
+public class ProjectSearchOptions implements SearchOptions {
 
   private String customerId;
 

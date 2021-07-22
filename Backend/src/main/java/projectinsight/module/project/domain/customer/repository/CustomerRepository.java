@@ -1,4 +1,4 @@
-package projectinsight.module.project.domain.customer;
+package projectinsight.module.project.domain.customer.repository;
 
 
 import projectinsight.module.app.commons.uow.Repository;
@@ -13,7 +13,7 @@ public interface CustomerRepository extends Repository {
   Customer findForUpdate(String id);
   void add(Customer customer);
   void remove(Customer customer);
-  List<Customer> search();
+  List<Customer> search(CustomerSearchOptions options);
   Map<String, Customer> findAll();
 
 }

@@ -1,17 +1,17 @@
 package projectinsight.module.project.persistence.customer;
 
 import projectinsight.module.app.commons.uow.RepositoryAbstractImpl;
-import projectinsight.module.project.domain.customer.CustomerRepository;
+import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.customer.model.Customer;
+import projectinsight.module.project.domain.customer.repository.CustomerSearchOptions;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CustomerRepositoryImpl extends RepositoryAbstractImpl<String, Customer> implements CustomerRepository {
+public class CustomerRepositoryImpl extends RepositoryAbstractImpl<String, Customer, CustomerSearchOptions> implements CustomerRepository {
 
   @Override
   protected String getFindForReadQuery() {
@@ -25,7 +25,6 @@ public class CustomerRepositoryImpl extends RepositoryAbstractImpl<String, Custo
 
   @Override
   protected String getFindForUpdateQuery() {
-
     return "" +
       "SELECT * " +
       "FROM customer " +
@@ -40,14 +39,33 @@ public class CustomerRepositoryImpl extends RepositoryAbstractImpl<String, Custo
       "SELECT * " +
       "FROM customer " +
       "WHERE deleted = false " +
+      "${filterOptionPlaceHolder} " +
       "ORDER BY customer.name ASC";
   }
 
   @Override
-  protected Customer buildEntityFromResultSet(ResultSet resultSet) {
+  protected String buildFilterOptionClause(CustomerSearchOptions options, Map<Integer, Object> parameterNameValueMaps) {
+    return " ";
+  }
+
+  @Override
+  protected Customer buildSingleEntityFromResultSet(ResultSet resultSet) {
     return new CustomerMapper()
       .setResultSetData(resultSet)
       .buildCustomer();
+  }
+
+  @Override
+  protected List<Customer> buildListEntitiesFromResultSet(ResultSet resultSet) throws SQLException {
+
+    List<Customer> result = new ArrayList<>();
+
+    while (resultSet.next()) {
+      Customer customer = buildSingleEntityFromResultSet(resultSet);
+      result.add(customer);
+    }
+
+    return result;
   }
 
   @Override
@@ -127,7 +145,9 @@ public class CustomerRepositoryImpl extends RepositoryAbstractImpl<String, Custo
 
   @Override
   public Map<String, Customer> findAll() {
-    return search().stream().collect(Collectors.toMap(x -> x.getId(), x -> x));
+    return search(
+      new CustomerSearchOptions.CustomerSearchOptionsBuilder().build()
+    ).stream().collect(Collectors.toMap(x -> x.getId(), x -> x));
   }
 
 }

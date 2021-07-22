@@ -1,17 +1,17 @@
 package projectinsight.module.project.domain.project.repository;
 
 
+import projectinsight.module.app.commons.uow.Repository;
 import projectinsight.module.project.domain.project.model.Project;
-import projectinsight.module.project.domain.project.repository.data.ProjectSearchOptions;
 
 import java.util.List;
 
-public interface ProjectRepository {
+public interface ProjectRepository extends Repository {
 
   Project findForRead(String id);
   Project findForUpdate(String id);
   List<Project> search(ProjectSearchOptions options);
   void add(Project project);
-  void remove(String id);
+  void remove(Project project);
 
 }

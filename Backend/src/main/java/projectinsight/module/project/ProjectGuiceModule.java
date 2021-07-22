@@ -2,10 +2,14 @@ package projectinsight.module.project;
 
 import com.google.inject.AbstractModule;
 
+import com.google.inject.multibindings.MapBinder;
+import projectinsight.module.app.commons.uow.Repository;
 import projectinsight.module.app.commons.uow.UnitOfWork;
 import projectinsight.module.app.commons.uow.UnitOfWorkProvider;
-import projectinsight.module.project.domain.customer.CustomerRepository;
+import projectinsight.module.project.domain.customer.repository.CustomerRepository;
+import projectinsight.module.project.domain.customer.model.Customer;
 import projectinsight.module.project.domain.employee.EmployeeRepository;
+import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.model.ProjectBuilder;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;
 import projectinsight.module.project.persistence.customer.CustomerRepositoryImpl;
@@ -16,7 +20,8 @@ import projectinsight.module.project.rest.project.ProjectRestApiImpl;
 
 public class ProjectGuiceModule extends AbstractModule {
 
-	@Override
+
+  @Override
 	protected void configure() {
 
 
@@ -34,6 +39,10 @@ public class ProjectGuiceModule extends AbstractModule {
     bind(EmployeeRepository.class).to(EmployeeRepositoryImpl.class).asEagerSingleton();
     bind(CustomerRepository.class).to(CustomerRepositoryImpl.class).asEagerSingleton();
 
+    //map repository in unit of work
+    MapBinder<Class, Repository> unitOfWorkRepositoryMap = MapBinder.newMapBinder(binder(), Class.class, Repository.class);
+    unitOfWorkRepositoryMap.addBinding(Customer.class).to(CustomerRepository.class);
+    unitOfWorkRepositoryMap.addBinding(Project.class).to(ProjectRepository.class);
   }
 
 }

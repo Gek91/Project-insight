@@ -6,19 +6,18 @@ import projectinsight.module.app.commons.BaseRestApiImpl;
 import projectinsight.module.app.commons.exception.EntityNotExistException;
 import projectinsight.module.app.commons.uow.UnitOfWork;
 import projectinsight.module.app.service.PersistenceService;
-import projectinsight.module.project.domain.customer.CustomerRepository;
+import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.customer.model.Customer;
-import projectinsight.module.project.domain.customer.model.CustomerBuilder;
+import projectinsight.module.project.domain.customer.repository.CustomerSearchOptions;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;
-import projectinsight.module.project.domain.project.repository.data.ProjectSearchOptions;
+import projectinsight.module.project.domain.project.repository.ProjectSearchOptions;
 import projectinsight.module.project.rest.customer.data.CreateCustomerRequestDTO;
 import projectinsight.module.project.rest.customer.data.CustomerDetailDTO;
 import projectinsight.module.project.rest.customer.data.CustomerListDTO;
 import projectinsight.module.project.rest.customer.data.EditCustomerRequestDTO;
 
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 
 public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRestApi {
@@ -46,7 +45,9 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
 
       unitOfWork.beginUnitOfWorkTransaction();
 
-      List<Customer> customers = customerRepository.search();
+      List<Customer> customers = customerRepository.search(
+        new CustomerSearchOptions.CustomerSearchOptionsBuilder().build()
+      );
 
       response = CustomerListDTO.buildDTO(customers);
 

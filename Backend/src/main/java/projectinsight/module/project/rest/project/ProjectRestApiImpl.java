@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import projectinsight.module.app.commons.BaseRestApiImpl;
 import projectinsight.module.app.commons.exception.EntityNotExistException;
 import projectinsight.module.app.service.PersistenceService;
-import projectinsight.module.project.domain.customer.CustomerRepository;
+import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.employee.EmployeeRepository;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;

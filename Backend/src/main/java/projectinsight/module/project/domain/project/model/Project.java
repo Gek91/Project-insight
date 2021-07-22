@@ -1,6 +1,7 @@
 package projectinsight.module.project.domain.project.model;
 
 
+import projectinsight.module.app.commons.uow.Entity;
 import projectinsight.module.app.commons.validations.ValidationErrorTypeEnum;
 import projectinsight.module.app.commons.validations.ValidationManager;
 
@@ -8,7 +9,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Project {
+public class Project extends Entity<String> {
 
   protected String id;
   protected String name;

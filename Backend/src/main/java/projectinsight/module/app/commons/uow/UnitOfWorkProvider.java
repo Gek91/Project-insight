@@ -3,19 +3,20 @@ package projectinsight.module.app.commons.uow;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import projectinsight.module.app.service.PersistenceService;
-import projectinsight.module.project.domain.customer.CustomerRepository;
+
+import java.util.Map;
 
 public class UnitOfWorkProvider implements Provider<UnitOfWork> {
 
   //TODO inject repository come mappa
   @Inject
-  private CustomerRepository customerRepository;
+  private PersistenceService persistenceService;
 
   @Inject
-  private PersistenceService persistenceService;
+  private Map<Class, Repository> repositories;
 
   @Override
   public UnitOfWork get() {
-    return new UnitOfWork(persistenceService, customerRepository);
+    return new UnitOfWork(persistenceService, repositories);
   }
 }
