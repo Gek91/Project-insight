@@ -7,7 +7,7 @@ import projectinsight.module.app.commons.validations.ValidationManager;
 import projectinsight.module.project.domain.customer.model.Customer;
 import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.employee.model.Employee;
-import projectinsight.module.project.domain.employee.EmployeeRepository;
+import projectinsight.module.project.domain.employee.repository.EmployeeRepository;
 
 import java.time.Instant;
 import java.util.*;
@@ -21,6 +21,7 @@ public class ProjectBuilder {
   private CustomerRepository customerRepository;
 
   protected String name;
+  protected int version;
   protected String description;
   protected List<String> projectManagerIds;
   protected List<String> techLeadIds;
@@ -41,6 +42,11 @@ public class ProjectBuilder {
 
   public ProjectBuilder setName(String name) {
     this.name = name;
+    return this;
+  }
+  public ProjectBuilder setVersion(int version) {
+    this.version = version;
+
     return this;
   }
   public ProjectBuilder setProjectManagerIds(List<String> projectManagerIds) {
@@ -78,6 +84,7 @@ public class ProjectBuilder {
     Project project = new Project();
 
     this.id = UIIDGenerator.generate();
+    this.version = 0;
     this.creationInstant = Instant.now();
     this.lastUpdateInstant = this.creationInstant;
     this.deleted = false;
@@ -96,6 +103,8 @@ public class ProjectBuilder {
     this.lastUpdateInstant = Instant.now();
 
     populateProjectFields(project);
+
+    project.setUpdated();
   }
 
   private void projectValidations() {
@@ -142,6 +151,7 @@ public class ProjectBuilder {
 
   protected void populateProjectFields(Project project) {
 
+    project.version = this.version;
     project.name = this.name;
     project.description = this.description;
     project.team = new ProjectTeam(this.projectManagerIds, this.techLeadIds, this.developersIds);

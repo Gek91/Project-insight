@@ -14,23 +14,4 @@ public  abstract class BaseRestApiImpl {
     return logger;
   }
 
-  protected void handleExceptionAndRollbackJdbcTransaction(Exception e, PersistenceService persistenceService) {
-
-    rollbackJdbcTransaction(persistenceService);
-
-    if (e instanceof RuntimeException) {
-      throw (RuntimeException) e;
-    } else {
-      throw new RuntimeException(e);
-    }
-
-  }
-
-  protected void rollbackJdbcTransaction(PersistenceService persistenceService) {
-    try {
-      persistenceService.rollbackJdbcTransaction();
-    } catch (SQLException e1) {
-      getLogger().error("Cannot rollback JDBC transaction", e1);
-    }
-  }
 }

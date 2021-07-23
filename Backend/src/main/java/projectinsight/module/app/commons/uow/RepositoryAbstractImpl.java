@@ -8,10 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class RepositoryAbstractImpl<K, T extends Entity<K>, W extends SearchOptions> implements Repository {
@@ -113,7 +110,11 @@ public abstract class RepositoryAbstractImpl<K, T extends Entity<K>, W extends S
 
           result.addAll(buildListEntitiesFromResultSet(resultSet));
 
-          this.entities.get(OperationEnum.GET).putAll(result.stream().collect(Collectors.toMap(x -> x.getId(), x -> x)));
+          result.stream().forEach(
+            elem -> {
+              this.entities.get(OperationEnum.GET).computeIfAbsent(elem.getId(), x -> elem);
+            }
+          );
         }
       }
     } catch (Exception e) {
@@ -145,7 +146,11 @@ public abstract class RepositoryAbstractImpl<K, T extends Entity<K>, W extends S
     );
 
     entities.get(OperationEnum.GET).values().stream().filter(x -> x.isUpdated()).forEach(
-      entity -> applyUpdate(entity)
+      entity -> {
+        if(!applyUpdate(entity)) {
+          throw new ConcurrentModificationException();
+        }
+      }
     );
   }
 

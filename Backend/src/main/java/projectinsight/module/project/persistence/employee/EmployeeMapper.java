@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class EmployeeMapper extends EmployeeBuilder {
 
-  public Employee buildEmployee(ResultSet resultSet) {
+  public EmployeeMapper setResultSetData(ResultSet resultSet) {
 
     try {
       this.id = resultSet.getString("id");
@@ -19,8 +19,13 @@ public class EmployeeMapper extends EmployeeBuilder {
       this.deleted = resultSet.getBoolean("deleted");
 
     } catch (SQLException e) {
-      e.printStackTrace(); //TODO
+      throw new RuntimeException(e);
     }
+
+    return this;
+  }
+
+  public Employee buildEmployee() {
 
     Employee employee = new Employee();
     populateEmployeeFields(employee);

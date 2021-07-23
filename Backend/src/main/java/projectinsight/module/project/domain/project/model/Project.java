@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class Project extends Entity<String> {
 
   protected String id;
+  protected int version;
   protected String name;
   protected String description;
   protected String customerId;
@@ -29,6 +30,7 @@ public class Project extends Entity<String> {
   public String getId() {
     return id;
   }
+  public int getVersion() { return version; }
   public String getName() {
     return name;
   }
@@ -81,7 +83,8 @@ public class Project extends Entity<String> {
       .throwValidationExceptionIfHasErrors();
 
     this.versions.put(newVersion.getProjectVersionString(), newVersion);
-    this.lastUpdateInstant = Instant.now();
+
+    this.setUpdated();
   }
 
   private boolean isVersionsValuesConsistent(ProjectVersion newVersion) {
@@ -99,7 +102,8 @@ public class Project extends Entity<String> {
     this.versions.remove(
       ProjectVersion.buildProjectVersionString(major, minor, patch)
     );
-    this.lastUpdateInstant = Instant.now();
+
+    this.setUpdated();
   }
 
   public static ProjectBuilder getBuilder() {

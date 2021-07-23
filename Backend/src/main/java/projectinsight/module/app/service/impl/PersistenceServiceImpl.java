@@ -101,7 +101,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 
-	@Override
+	/*@Override
 	public void beginJdbcTransaction() throws SQLException {
 
 		Connection connection = getConnection();
@@ -135,7 +135,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 			connection.setAutoCommit(true);
 		}
 
-	}
+	}*/
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 	//DATASTORE METHODS

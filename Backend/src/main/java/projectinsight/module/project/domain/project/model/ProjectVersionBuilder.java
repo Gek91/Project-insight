@@ -82,7 +82,6 @@ public class ProjectVersionBuilder {
     this.lastUpdateInstant = Instant.now();
 
     populateVersionFields(version);
-
   }
 
   private void projectVersionValidations() {

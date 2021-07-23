@@ -8,7 +8,8 @@ import projectinsight.module.app.commons.uow.UnitOfWork;
 import projectinsight.module.app.commons.uow.UnitOfWorkProvider;
 import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.customer.model.Customer;
-import projectinsight.module.project.domain.employee.EmployeeRepository;
+import projectinsight.module.project.domain.employee.model.Employee;
+import projectinsight.module.project.domain.employee.repository.EmployeeRepository;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.model.ProjectBuilder;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;
@@ -43,6 +44,7 @@ public class ProjectGuiceModule extends AbstractModule {
     MapBinder<Class, Repository> unitOfWorkRepositoryMap = MapBinder.newMapBinder(binder(), Class.class, Repository.class);
     unitOfWorkRepositoryMap.addBinding(Customer.class).to(CustomerRepository.class);
     unitOfWorkRepositoryMap.addBinding(Project.class).to(ProjectRepository.class);
+    unitOfWorkRepositoryMap.addBinding(Employee.class).to(EmployeeRepository.class);
   }
 
 }

@@ -1,11 +1,14 @@
 package projectinsight.module.project.rest.project;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import projectinsight.module.app.commons.BaseRestApiImpl;
 import projectinsight.module.app.commons.exception.EntityNotExistException;
-import projectinsight.module.app.service.PersistenceService;
+import projectinsight.module.app.commons.uow.UnitOfWork;
+import projectinsight.module.project.domain.customer.model.Customer;
 import projectinsight.module.project.domain.customer.repository.CustomerRepository;
-import projectinsight.module.project.domain.employee.EmployeeRepository;
+import projectinsight.module.project.domain.employee.repository.EmployeeRepository;
+import projectinsight.module.project.domain.employee.model.Employee;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;
 import projectinsight.module.project.rest.project.data.ProjectDetailDTO;
@@ -16,27 +19,21 @@ import java.util.List;
 public class ProjectRestApiImpl extends BaseRestApiImpl implements ProjectRestApi {
 
   @Inject
-  private PersistenceService persistenceService;
-
-  @Inject
-  private ProjectRepository projectRepository;
-
-  @Inject
-  private CustomerRepository customerRepository;
-
-  @Inject
-  private EmployeeRepository employeeRepository;
-
-
+  private Provider<UnitOfWork> unitOfWorkProvider;
 
   @Override
   public ProjectListDTO getProjectList() {
 
     ProjectListDTO response = null;
 
+    UnitOfWork unitOfWork = unitOfWorkProvider.get();
+
     try {
 
-      persistenceService.beginJdbcTransaction();
+      unitOfWork.beginUnitOfWorkTransaction();
+
+      ProjectRepository projectRepository = (ProjectRepository) unitOfWork.getRepository(Project.class);
+      CustomerRepository customerRepository = (CustomerRepository) unitOfWork.getRepository(Customer.class);
 
       List<Project> projects = projectRepository.search(null);
 
@@ -45,10 +42,10 @@ public class ProjectRestApiImpl extends BaseRestApiImpl implements ProjectRestAp
         customerRepository.findAll()
       );
 
-      persistenceService.commitJdbcTransaction();
+      unitOfWork.commitUnitOfWorkTransaction();
 
     } catch (Exception e) {
-      handleExceptionAndRollbackJdbcTransaction(e, persistenceService);
+      unitOfWork.handleExceptionAndRollbackJdbcTransaction(e);
     }
 
     return response;
@@ -59,8 +56,14 @@ public class ProjectRestApiImpl extends BaseRestApiImpl implements ProjectRestAp
 
     ProjectDetailDTO response = null;
 
+    UnitOfWork unitOfWork = unitOfWorkProvider.get();
+
+    ProjectRepository projectRepository = (ProjectRepository) unitOfWork.getRepository(Project.class);
+    CustomerRepository customerRepository = (CustomerRepository) unitOfWork.getRepository(Customer.class);
+    EmployeeRepository employeeRepository = (EmployeeRepository) unitOfWork.getRepository(Employee.class);
+
     try {
-      persistenceService.beginJdbcTransaction();
+      unitOfWork.beginUnitOfWorkTransaction();
 
       Project project = projectRepository.findForRead(id);
 
@@ -74,10 +77,10 @@ public class ProjectRestApiImpl extends BaseRestApiImpl implements ProjectRestAp
         employeeRepository.findAll()
       );
 
-      persistenceService.commitJdbcTransaction();
+      unitOfWork.commitUnitOfWorkTransaction();
 
     } catch (Exception e) {
-      handleExceptionAndRollbackJdbcTransaction(e, persistenceService);
+      unitOfWork.handleExceptionAndRollbackJdbcTransaction(e);
     }
 
     return response;

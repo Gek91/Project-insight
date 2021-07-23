@@ -16,6 +16,7 @@ public class ProjectMapper extends ProjectBuilder {
 
     try {
       this.id = resultSet.getString("id");
+      this.version = resultSet.getInt("version");
       this.name = resultSet.getString("name");
       this.description = resultSet.getString("description");
       this.customerId = resultSet.getString("customer_id");

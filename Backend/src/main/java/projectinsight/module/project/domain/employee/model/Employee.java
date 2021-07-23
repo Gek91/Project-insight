@@ -1,9 +1,11 @@
 package projectinsight.module.project.domain.employee.model;
 
 
+import projectinsight.module.app.commons.uow.Entity;
+
 import java.time.Instant;
 
-public class Employee {
+public class Employee extends Entity<String> {
 
   protected String id;
   protected String name;

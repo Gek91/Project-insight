@@ -8,10 +8,10 @@ import java.util.Map;
 
 public class UnitOfWorkProvider implements Provider<UnitOfWork> {
 
-  //TODO inject repository come mappa
   @Inject
   private PersistenceService persistenceService;
 
+  //Inject all repositories in unit of work
   @Inject
   private Map<Class, Repository> repositories;
 
