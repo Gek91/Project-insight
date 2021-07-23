@@ -1,5 +1,6 @@
 package projectinsight.module.project.rest.project;
 
+import projectinsight.module.project.rest.project.data.CreateProjectRequestDTO;
 import projectinsight.module.project.rest.project.data.ProjectDetailDTO;
 import projectinsight.module.project.rest.project.data.ProjectListDTO;
 
@@ -19,4 +20,7 @@ public interface ProjectRestApi {
   @Path("/{id}")
   ProjectDetailDTO getProjectDetail(@PathParam("id") String id);
 
+  @POST
+  @Path("/")
+  ProjectDetailDTO createProject(CreateProjectRequestDTO request);
 }

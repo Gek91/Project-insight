@@ -106,9 +106,5 @@ public class Project extends Entity<String> {
     this.setUpdated();
   }
 
-  public static ProjectBuilder getBuilder() {
-    return new ProjectBuilder();
-  }
-
 }
 

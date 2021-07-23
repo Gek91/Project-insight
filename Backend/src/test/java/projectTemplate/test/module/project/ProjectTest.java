@@ -17,7 +17,7 @@ public class ProjectTest extends BaseUnitTest {
     super(Collections.singletonList(ProjectGuiceModule.class));
   }
 
-  @Test
+  /*@Test
   public void testCreateProject() {
 
     ProjectBuilder builder = Project.getBuilder();
@@ -53,5 +53,5 @@ public class ProjectTest extends BaseUnitTest {
     //Assert.assertFalse(project.getLastProjectVersion().isPresent());
     //Assert.assertEquals(0 , project.getVersions().size());
 
-  }
+  }*/
 }

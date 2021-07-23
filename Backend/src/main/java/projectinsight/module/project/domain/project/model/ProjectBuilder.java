@@ -1,6 +1,5 @@
 package projectinsight.module.project.domain.project.model;
 
-import com.google.inject.Inject;
 import projectinsight.module.app.commons.UIIDGenerator;
 import projectinsight.module.app.commons.validations.ValidationErrorTypeEnum;
 import projectinsight.module.app.commons.validations.ValidationManager;
@@ -15,9 +14,8 @@ import java.util.stream.Collectors;
 
 public class ProjectBuilder {
 
-  @Inject
+  //dependencies
   private EmployeeRepository employeeRepository;
-  @Inject
   private CustomerRepository customerRepository;
 
   protected String name;
@@ -33,6 +31,13 @@ public class ProjectBuilder {
   protected Instant creationInstant;
   protected Instant lastUpdateInstant;
   protected boolean deleted;
+
+  public ProjectBuilder(EmployeeRepository employeeRepository, CustomerRepository customerRepository) {
+    this();
+
+    this.employeeRepository = employeeRepository;
+    this.customerRepository = customerRepository;
+  }
 
   protected ProjectBuilder() {
     this.projectManagerIds = new ArrayList<>();
@@ -121,7 +126,7 @@ public class ProjectBuilder {
     Set<String> idsSet = new HashSet<>();
     for(int i = 0 ; i < this.projectManagerIds.size() ; i++) {
       String id = this.projectManagerIds.get(i);
-      validations.validate(!employeesMap.containsKey(id) &&
+      validations.validate(employeesMap.containsKey(id) &&
         !idsSet.contains(id), "projectManagerIds["+ i +"]", ValidationErrorTypeEnum.INVALID);
       idsSet.add(id);
     }
@@ -129,7 +134,7 @@ public class ProjectBuilder {
     idsSet = new HashSet<>();
     for(int i = 0 ; i <  techLeadIds.size() ; i++) {
       String id = this.techLeadIds.get(i);
-      validations.validate(!employeesMap.containsKey(id) &&
+      validations.validate(employeesMap.containsKey(id) &&
         !idsSet.contains(id), "techLeadIds["+ i +"]", ValidationErrorTypeEnum.INVALID);
       idsSet.add(id);
     }
@@ -137,13 +142,13 @@ public class ProjectBuilder {
     idsSet = new HashSet<>();
     for(int i = 0 ; i < developersIds.size() ; i++) {
       String id = this.developersIds.get(i);
-      validations.validate(!employeesMap.containsKey(id) &&
+      validations.validate(employeesMap.containsKey(id) &&
         !idsSet.contains(id), "developersIds["+ i +"]", ValidationErrorTypeEnum.INVALID);
       idsSet.add(id);
     }
 
     if(this.customerId != null) {
-      validations.validate(!customersMap.containsKey(customerId), "customerId", ValidationErrorTypeEnum.INVALID);
+      validations.validate(customersMap.containsKey(customerId), "customerId", ValidationErrorTypeEnum.INVALID);
     }
 
     validations.throwValidationExceptionIfHasErrors();

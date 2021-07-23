@@ -129,9 +129,10 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
         statement.setString(2, project.getName());
         statement.setInt(3, project.getVersion());
         statement.setString(4, project.getDescription());
-        statement.setTimestamp(5, Timestamp.from(project.getCreationInstant()));
-        statement.setTimestamp(6, Timestamp.from(project.getLastUpdateInstant()));
-        statement.setBoolean(7, project.isDeleted());
+        statement.setString(5, project.getCustomerId());
+        statement.setTimestamp(6, Timestamp.from(project.getCreationInstant()));
+        statement.setTimestamp(7, Timestamp.from(project.getLastUpdateInstant()));
+        statement.setBoolean(8, project.isDeleted());
 
         statement.execute();
       }
@@ -145,7 +146,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
     if(project.getTeam() != null) {
 
       String query = "" +
-        "INSERT project_team_member" +
+        "INSERT INTO project_team_member " +
         "VALUES(?, ?, ?) ";
 
       try (Connection connection = persistenceService.getConnection()) {
@@ -202,10 +203,10 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
 
   private void insertProjectVersions(Project project) {
 
-    if(project.getVersions() != null) {
+    if(project.getVersions() != null && !project.getVersions().isEmpty()) {
 
       String query = "" +
-        "INSERT project_version" +
+        "INSERT INTO project_version " +
         "VALUES(?, ?, ?) ";
 
       try (Connection connection = persistenceService.getConnection()) {
@@ -309,7 +310,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
           "FROM project_team_member " +
           "WHERE project_id IN (%s) ";
 
-        query = String.format(query, projectsIds.stream().collect(Collectors.joining(", ")));
+        query = String.format(query, projectsIds.stream().map(x -> "\'" + x + "\'").collect(Collectors.joining(", ")));
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
 
@@ -349,7 +350,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
           "WHERE project_id IN (%s) " +
           "ORDER BY major_version ASC, minor_version ASC, patch_version ASC";
 
-        query = String.format(query, projectsIds.stream().collect(Collectors.joining(", ")));
+        query = String.format(query, projectsIds.stream().map(x -> "\'" + x + "\'").collect(Collectors.joining(", ")));
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
 

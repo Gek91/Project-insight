@@ -7,7 +7,7 @@ import projectinsight.module.project.domain.project.model.Project;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectDetailDTO extends AbstractProjectDTO{
+public class ProjectDetailDTO extends AbstractProjectDTO {
 
 
   private ProjectTeamDTO team;

@@ -12,6 +12,7 @@ import projectinsight.module.project.domain.employee.model.Employee;
 import projectinsight.module.project.domain.employee.repository.EmployeeRepository;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.model.ProjectBuilder;
+import projectinsight.module.project.rest.project.ProjectBuilderProvider;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;
 import projectinsight.module.project.persistence.customer.CustomerRepositoryImpl;
 import projectinsight.module.project.persistence.employee.EmployeeRepositoryImpl;
@@ -32,7 +33,8 @@ public class ProjectGuiceModule extends AbstractModule {
 
 	  //Services
 
-    bind(ProjectBuilder.class);
+    //Providers
+    bind(ProjectBuilder.class).toProvider(ProjectBuilderProvider.class);
     bind(UnitOfWork.class).toProvider(UnitOfWorkProvider.class);
 
     //Repository
