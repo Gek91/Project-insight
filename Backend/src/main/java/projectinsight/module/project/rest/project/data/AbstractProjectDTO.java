@@ -14,6 +14,7 @@ public abstract class AbstractProjectDTO {
   private CustomerSimpleDTO customer;
   private long creationInstant;
   private long lastUpdateInstant;
+  private int version;
 
   public String getId() {
     return id;
@@ -51,6 +52,12 @@ public abstract class AbstractProjectDTO {
   public void setLastUpdateInstant(long lastUpdateInstant) {
     this.lastUpdateInstant = lastUpdateInstant;
   }
+  public int getVersion() {
+    return version;
+  }
+  public void setVersion(int version) {
+    this.version = version;
+  }
 
   protected static void populateDTOFields(AbstractProjectDTO output, Project input, Map<String, Customer> customerMap) {
     output.setCustomer(CustomerSimpleDTO.buildDTO(customerMap.get(input.getCustomerId())));
@@ -59,5 +66,6 @@ public abstract class AbstractProjectDTO {
     output.setName(input.getName());
     output.setCreationInstant(input.getCreationInstant().toEpochMilli());
     output.setLastUpdateInstant(input.getLastUpdateInstant().toEpochMilli());
+    output.setVersion(input.getVersion());
   }
 }

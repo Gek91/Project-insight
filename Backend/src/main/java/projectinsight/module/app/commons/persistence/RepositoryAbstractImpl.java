@@ -1,4 +1,4 @@
-package projectinsight.module.app.commons.uow;
+package projectinsight.module.app.commons.persistence;
 
 import com.google.inject.Inject;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class RepositoryAbstractImpl<K, T extends Entity<K>, W extends SearchOptions> implements Repository {
 

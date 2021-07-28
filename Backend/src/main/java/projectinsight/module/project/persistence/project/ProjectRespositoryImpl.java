@@ -1,9 +1,9 @@
 package projectinsight.module.project.persistence.project;
 
 import com.google.inject.Inject;
-import org.apache.commons.lang3.text.StrSubstitutor;
-import projectinsight.module.app.commons.uow.RepositoryAbstractImpl;
-import projectinsight.module.app.service.PersistenceService;
+import com.google.inject.Provider;
+import projectinsight.module.app.commons.persistence.OperationEnum;
+import projectinsight.module.app.commons.persistence.RepositoryAbstractImpl;
 import projectinsight.module.project.domain.project.repository.ProjectRepository;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.model.ProjectVersion;
@@ -16,6 +16,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Project, ProjectSearchOptions> implements ProjectRepository {
+
+  @Inject
+  private Provider<ProjectMapper> projectMapperProvider;
+
+  @Inject
+  private Provider<ProjectVersionMapper> projectVersionMapperProvider;
+
 
   @Override
   protected String getFindForReadQuery() {
@@ -75,7 +82,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
     Map<EmployeeRoleEnum, List<String>> teamMemberMap = retrieveProjectsTeamMember(Collections.singleton(projectId)).get(projectId);
     List<ProjectVersion> versions = retrieveProjectsVersions(Collections.singleton(projectId)).get(projectId);
 
-    return new ProjectMapper()
+    return projectMapperProvider.get()
       .setResultSetData(resultSet)
       .setTeamMemberData(teamMemberMap)
       .setVersionsData(versions).buildProject();
@@ -89,7 +96,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
     Map<String, ProjectMapper> projectMapperMap = new HashMap<>();
     while (resultSet.next()) {
       String projectId = resultSet.getString("id");
-      projectMapperMap.put(projectId, new ProjectMapper().setResultSetData(resultSet));
+      projectMapperMap.put(projectId, projectMapperProvider.get().setResultSetData(resultSet));
     }
 
     Map<String, Map<EmployeeRoleEnum, List<String>>> projectEmployeeMap = retrieveProjectsTeamMember(projectMapperMap.keySet());
@@ -112,7 +119,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
 
     insertProject(project);
     insertProjectTeamMember(project);
-    insertProjectVersions(project);
+    insertProjectVersions(project.getId(), project.getVersions());
   }
 
   private void insertProject(Project project) {
@@ -201,35 +208,65 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
     }
   }
 
-  private void insertProjectVersions(Project project) {
+  private void insertProjectVersions(String projectId, List<ProjectVersion> versions) {
 
-    if(project.getVersions() != null && !project.getVersions().isEmpty()) {
+    if(versions != null && !versions.isEmpty()) {
 
       String query = "" +
         "INSERT INTO project_version " +
-        "VALUES(?, ?, ?) ";
+        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 
       try (Connection connection = persistenceService.getConnection()) {
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
 
-          for (ProjectVersion version : project.getVersions()) {
-            statement.setInt(1, version.getMajorVersion());
-            statement.setInt(2, version.getMinorVersion());
-            statement.setInt(3, version.getPatchVersion());
-            statement.setString(4, project.getId());
-            statement.setString(5, version.getVersionLabel());
-            statement.setString(6, version.getNote());
-            statement.setInt(7, version.getStatus().getId());
-            statement.setDate(8, Date.valueOf(version.getReleaseDate()));
-            statement.setTimestamp(5, Timestamp.from(version.getCreationInstant()));
-            statement.setTimestamp(6, Timestamp.from(version.getLastUpdateInstant()));
+          for (ProjectVersion version : versions) {
+            statement.setString(1, version.getId());
+            statement.setInt(2, version.getMajorVersion());
+            statement.setInt(3, version.getMinorVersion());
+            statement.setInt(4, version.getPatchVersion());
+            statement.setString(5, projectId);
+            statement.setString(6, version.getVersionLabel());
+            statement.setString(7, version.getNote());
+            statement.setInt(8, version.getStatus().getId());
+            statement.setDate(9, Date.valueOf(version.getReleaseDate()));
+            statement.setTimestamp(10, Timestamp.from(version.getCreationInstant()));
+            statement.setTimestamp(11, Timestamp.from(version.getLastUpdateInstant()));
             statement.addBatch();
           }
 
           statement.executeBatch();
         }
       } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  private void removeProjectVersions(String projectId, List<ProjectVersion> versions) {
+
+    if(versions != null && !versions.isEmpty()) {
+
+      String query ="" +
+        "DELETE FROM project_version " +
+        "WHERE project_id = ? AND major_version = ? " +
+        "AND minor_version = ? AND patch_version = ? ";
+
+      try (Connection connection = persistenceService.getConnection()) {
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+
+          for (ProjectVersion version : versions) {
+            statement.setString(1, projectId);
+            statement.setInt(2, version.getMajorVersion());
+            statement.setInt(3, version.getMinorVersion());
+            statement.setInt(4, version.getPatchVersion());
+            statement.addBatch();
+          }
+
+          statement.executeUpdate();
+        }
+      } catch (SQLException e) {
         throw new RuntimeException(e);
       }
     }
@@ -242,6 +279,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
 
       removeProjectTeamMembers(project.getId());
       insertProjectTeamMember(project);
+      updateProjectVersions(project);
 
       return true;
     } else {
@@ -273,6 +311,28 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void updateProjectVersions(Project project) {
+
+    List<ProjectVersion> actualVersions = retrieveProjectsVersions(Collections.singleton(project.getId())).get(project.getId());
+
+    Map<OperationEnum, List<ProjectVersion>> operationsMap = computeProjectVersionsOperations(actualVersions, project.getVersions());
+
+    insertProjectVersions(project.getId(), operationsMap.get(OperationEnum.ADD));
+    removeProjectVersions(project.getId(), operationsMap.get(OperationEnum.REMOVE));
+  }
+
+  private Map<OperationEnum, List<ProjectVersion>> computeProjectVersionsOperations(List<ProjectVersion> oldStatus, List<ProjectVersion> newStatus) {
+
+    Map<OperationEnum, List<ProjectVersion>> result = new HashMap<>();
+    result.put(OperationEnum.ADD, new ArrayList<>());
+    result.put(OperationEnum.REMOVE, new ArrayList<>());
+
+    result.get(OperationEnum.REMOVE).addAll(oldStatus.stream().filter(x -> !newStatus.contains(x)).collect(Collectors.toList()));
+    result.get(OperationEnum.ADD).addAll(newStatus.stream().filter(x -> !oldStatus.contains(x)).collect(Collectors.toList()));
+
+    return result;
   }
 
   @Override
@@ -360,7 +420,7 @@ public class ProjectRespositoryImpl extends RepositoryAbstractImpl<String, Proje
 
             while (resultSet.next()) {
               String projectId = resultSet.getString("project_id");
-              ProjectVersion projectVersion = new ProjectVersionMapper().buildProjectVersion(resultSet);
+              ProjectVersion projectVersion = projectVersionMapperProvider.get().buildProjectVersion(resultSet);
 
               result.computeIfAbsent(projectId, x -> new ArrayList<>()).add(projectVersion);
             }

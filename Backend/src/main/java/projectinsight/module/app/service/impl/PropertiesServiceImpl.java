@@ -1,6 +1,7 @@
 package projectinsight.module.app.service.impl;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 import com.google.inject.Inject;
@@ -16,11 +17,12 @@ public class PropertiesServiceImpl implements PropertiesService {
 	private Properties configProperties;
 	private AppRuntimeEnvironment appRuntimeEnvironment;
 
+  private DateTimeFormatter localDateStringFormatter;
 
 	@Inject
 	protected void initService(RuntimeEnvironment runtimeEnvironment) throws IOException {
 
-		//Retrieve runtime enviroment (injected)
+		//Retrieve runtime environment (injected)
 		this.appRuntimeEnvironment = AppRuntimeEnvironment.getValueById(runtimeEnvironment.getId());
 
 		if (this.appRuntimeEnvironment == null) {
@@ -30,8 +32,15 @@ public class PropertiesServiceImpl implements PropertiesService {
 		//Load properties file
 		this.configProperties = new Properties();
 		configProperties.load(getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_CLASSPATH));
+
+    buildDateStringFormatters();
 	}
 
+	private void buildDateStringFormatters() {
+
+    String pattern = configProperties.getProperty("localdate.formatter.pattern");
+    this.localDateStringFormatter = DateTimeFormatter.ofPattern(pattern);
+  }
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -56,9 +65,9 @@ public class PropertiesServiceImpl implements PropertiesService {
 	}
 
 	@Override
-	public String getTestValue() {
+  public DateTimeFormatter getLocalDateStringFormatter() {
 
-		return configProperties.getProperty("project.test");
-	}
+    return this.localDateStringFormatter;
+  }
 
 }

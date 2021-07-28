@@ -1,17 +1,16 @@
 package projectinsight.module.project.rest.project.data;
 
-import projectinsight.module.project.domain.project.model.ProjectVersion;
+import java.time.LocalDate;
 
-import java.time.format.DateTimeFormatter;
+public class CreateProjectVersionRequestDTO {
 
-public class ProjectVersionSimpleDTO {
-
-  private String id;
   private Integer majorVersion;
   private Integer minorVersion;
   private Integer patchVersion;
   private String versionLabel;
   private String releaseDate;
+  private String note;
+  private Integer statusId;
 
   public Integer getMajorVersion() {
     return majorVersion;
@@ -43,32 +42,17 @@ public class ProjectVersionSimpleDTO {
   public void setReleaseDate(String releaseDate) {
     this.releaseDate = releaseDate;
   }
-  public String getId() {
-    return id;
+  public String getNote() {
+    return note;
   }
-  public void setId(String id) { this.id = id;
-
+  public void setNote(String note) {
+    this.note = note;
   }
-
-  public static ProjectVersionSimpleDTO buildDTO(ProjectVersion input) {
-
-    if(input == null) {
-      return null;
-    }
-
-    ProjectVersionSimpleDTO output = new ProjectVersionSimpleDTO();
-    populateDTOField(output, input);
-
-    return output;
+  public Integer getStatusId() {
+    return statusId;
+  }
+  public void setStatusId(Integer statusId) {
+    this.statusId = statusId;
   }
 
-  protected static void populateDTOField(ProjectVersionSimpleDTO output, ProjectVersion input) {
-
-    output.setId(input.getId());
-    output.setMajorVersion(input.getMajorVersion());
-    output.setMinorVersion(input.getMinorVersion());
-    output.setPatchVersion(input.getMinorVersion());
-    output.setVersionLabel(input.getVersionLabel());
-    output.setReleaseDate(input.getReleaseDate() != null ? input.getReleaseDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null);
-  }
 }

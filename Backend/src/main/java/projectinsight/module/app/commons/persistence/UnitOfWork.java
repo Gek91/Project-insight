@@ -1,4 +1,4 @@
-package projectinsight.module.app.commons.uow;
+package projectinsight.module.app.commons.persistence;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

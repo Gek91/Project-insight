@@ -1,4 +1,4 @@
-package projectinsight.module.app.commons.uow;
+package projectinsight.module.app.commons.persistence;
 
 public enum OperationEnum {
 

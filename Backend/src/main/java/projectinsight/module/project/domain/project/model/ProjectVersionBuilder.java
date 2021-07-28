@@ -1,25 +1,35 @@
 package projectinsight.module.project.domain.project.model;
 
+import projectinsight.module.app.commons.UIIDGenerator;
 import projectinsight.module.app.commons.validations.ValidationErrorTypeEnum;
 import projectinsight.module.app.commons.validations.ValidationManager;
+import projectinsight.module.app.service.PropertiesService;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class ProjectVersionBuilder {
 
+  //dependencies
+  private PropertiesService propertiesService;
+
+  protected String id;
   protected Integer majorVersion;
   protected Integer minorVersion;
   protected Integer patchVersion;
   protected String versionLabel;
   protected String note;
-  protected LocalDate releaseDate;
+  protected String releaseDate;
   protected Integer statusId;
 
   protected Instant creationInstant;
   protected Instant lastUpdateInstant;
 
-  public ProjectVersionBuilder() { }
+
+  public ProjectVersionBuilder(PropertiesService propertiesService) {
+    this.propertiesService = propertiesService;
+  }
 
   public ProjectVersionBuilder setMajorVersion(Integer majorVersion) {
     this.majorVersion = majorVersion;
@@ -41,7 +51,7 @@ public class ProjectVersionBuilder {
     this.note = note;
     return this;
   }
-  public ProjectVersionBuilder setReleaseDate(LocalDate releaseDate) {
+  public ProjectVersionBuilder setReleaseDate(String releaseDate) {
     this.releaseDate = releaseDate;
     return this;
   }
@@ -49,27 +59,18 @@ public class ProjectVersionBuilder {
     this.statusId = statusId;
     return this;
   }
-  public ProjectVersionBuilder setCreationInstant(Instant creationInstant) {
-    this.creationInstant = creationInstant;
 
-    return this;
-  }
-  public ProjectVersionBuilder setLastUpdateInstant(Instant lastUpdateInstant) {
-    this.lastUpdateInstant = lastUpdateInstant;
-
-    return this;
-  }
-
-  protected ProjectVersion buildProjectVersion() {
+  public ProjectVersion buildProjectVersion() {
 
     projectVersionValidations();
 
     ProjectVersion version = new ProjectVersion();
 
-    populateVersionFields(version);
-
+    this.id = UIIDGenerator.generate();
     this.creationInstant = Instant.now();
     this.lastUpdateInstant = this.creationInstant;
+
+    populateVersionFields(version);
 
     return version;
   }
@@ -78,6 +79,7 @@ public class ProjectVersionBuilder {
 
     projectVersionValidations();
 
+    this.id = version.id;
     this.creationInstant = version.creationInstant;
     this.lastUpdateInstant = Instant.now();
 
@@ -96,17 +98,28 @@ public class ProjectVersionBuilder {
       .validate(
         this.statusId == null ||
           ProjectVersionStatusEnum.getValueById(this.statusId).isPresent(),
-        "statusId", ValidationErrorTypeEnum.INVALID)
-      .throwValidationExceptionIfHasErrors();
+        "statusId", ValidationErrorTypeEnum.INVALID);
+
+    if(this.releaseDate != null) {
+      try {
+        LocalDate.parse(this.releaseDate, propertiesService.getLocalDateStringFormatter());
+      } catch (DateTimeParseException e) {
+        validations.validate(false, "releaseDate", ValidationErrorTypeEnum.INVALID);
+      }
+    }
+
+    validations.throwValidationExceptionIfHasErrors();
   }
 
   protected void populateVersionFields(ProjectVersion version) {
+
+    version.id = this.id;
     version.majorVersion = this.majorVersion;
     version.minorVersion = this.minorVersion;
     version.patchVersion = this.patchVersion;
     version.versionLabel = this.versionLabel;
     version.note = this.note;
-    version.releaseDate = this.releaseDate;
+    version.releaseDate = LocalDate.parse(this.releaseDate, propertiesService.getLocalDateStringFormatter());
     version.status = ProjectVersionStatusEnum.getValueById(this.statusId).get();
 
     version.creationInstant = this.creationInstant;

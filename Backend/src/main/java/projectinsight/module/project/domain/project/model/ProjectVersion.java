@@ -6,6 +6,7 @@ import java.util.Objects;
 
 public class ProjectVersion {
 
+  protected String id;
   protected Integer majorVersion;
   protected Integer minorVersion;
   protected Integer patchVersion;
@@ -35,6 +36,7 @@ public class ProjectVersion {
     return ProjectVersion.buildProjectVersionString(this.majorVersion, this.minorVersion, this.patchVersion);
   }
 
+  public String getId() { return id; }
   public Integer getMajorVersion() {
     return majorVersion;
   }
@@ -76,12 +78,12 @@ public class ProjectVersion {
 
     ProjectVersion that = (ProjectVersion) o;
 
-    return majorVersion.equals(that.majorVersion) && minorVersion.equals(that.minorVersion) && patchVersion.equals(that.patchVersion);
+    return id.equals(that.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(majorVersion, minorVersion, patchVersion);
+    return Objects.hash(id);
   }
 
 }

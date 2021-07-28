@@ -1,7 +1,7 @@
 package projectinsight.module.project.domain.customer.model;
 
 
-import projectinsight.module.app.commons.uow.Entity;
+import projectinsight.module.app.commons.persistence.Entity;
 
 import java.time.Instant;
 
@@ -30,6 +30,4 @@ public class Customer extends Entity<String> {
   public boolean isDeleted() {
     return deleted;
   }
-
-  public static CustomerBuilder getBuilder() { return new CustomerBuilder(); }
 }

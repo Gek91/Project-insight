@@ -64,6 +64,7 @@ CREATE INDEX `project_team_project_id_idx` ON `project_team_member` (`project_id
 CREATE INDEX `project_team_employee_id_idx` ON `project_team_member` (`employee_id` ASC);
 
 CREATE TABLE `project_version` (
+  `id` VARCHAR(100) NOT NULL,
   `major_version` INT NOT NULL,
   `minor_version` INT NOT NULL,
   `patch_version` INT NOT NULL,
@@ -74,7 +75,7 @@ CREATE TABLE `project_version` (
   `release_date` DATE NOT NULL,
   `creation_instant` DATETIME(3) NOT NULL,
   `last_update_instant` DATETIME(3) NOT NULL,
-  PRIMARY KEY (`project_id`, `major_version`, `minor_version`, `patch_version`),
+  PRIMARY KEY (`id`),
   CONSTRAINT `fk_project_version_project_id`
       FOREIGN KEY (`project_id`)
       REFERENCES `project` (`id`)
@@ -83,3 +84,4 @@ CREATE TABLE `project_version` (
 ) ENGINE = InnoDB;
 
 CREATE INDEX `project_version_project_id_idx` ON `project_version` (`project_id` ASC);
+CREATE UNIQUE INDEX `project_version_unique_idx` ON `project_version` (`major_version`, `minor_version`, `patch_version`, `project_id`);

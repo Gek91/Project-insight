@@ -14,7 +14,7 @@ public class CustomerBuilder {
   protected Instant lastUpdateInstant;
   protected boolean deleted;
 
-  protected CustomerBuilder() { }
+  public CustomerBuilder() { }
 
   public CustomerBuilder setName(String name) {
     this.name = name;

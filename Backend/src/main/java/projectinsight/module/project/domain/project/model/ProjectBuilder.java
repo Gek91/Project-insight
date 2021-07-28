@@ -10,7 +10,6 @@ import projectinsight.module.project.domain.employee.repository.EmployeeReposito
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ProjectBuilder {
 
@@ -33,16 +32,12 @@ public class ProjectBuilder {
   protected boolean deleted;
 
   public ProjectBuilder(EmployeeRepository employeeRepository, CustomerRepository customerRepository) {
-    this();
-
-    this.employeeRepository = employeeRepository;
-    this.customerRepository = customerRepository;
-  }
-
-  protected ProjectBuilder() {
     this.projectManagerIds = new ArrayList<>();
     this.techLeadIds = new ArrayList<>();
     this.developersIds = new ArrayList<>();
+
+    this.employeeRepository = employeeRepository;
+    this.customerRepository = customerRepository;
   }
 
   public ProjectBuilder setName(String name) {
@@ -167,9 +162,7 @@ public class ProjectBuilder {
     project.lastUpdateInstant = this.lastUpdateInstant;
     project.deleted = this.deleted;
     if (this.versions != null) {
-      project.versions.putAll(
-        this.versions.stream().collect(Collectors.toMap(x -> x.getProjectVersionString(), x -> x))
-      );
+      project.versions.addAll(this.versions);
     }
   }
 }

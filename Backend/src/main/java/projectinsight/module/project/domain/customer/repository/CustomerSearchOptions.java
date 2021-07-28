@@ -1,6 +1,6 @@
 package projectinsight.module.project.domain.customer.repository;
 
-import projectinsight.module.app.commons.uow.SearchOptions;
+import projectinsight.module.app.commons.persistence.SearchOptions;
 
 public class CustomerSearchOptions implements SearchOptions {
 

@@ -1,7 +1,6 @@
 package projectinsight.module.project.domain.employee.repository;
 
-import projectinsight.module.app.commons.uow.SearchOptions;
-import projectinsight.module.project.domain.customer.repository.CustomerSearchOptions;
+import projectinsight.module.app.commons.persistence.SearchOptions;
 
 public class EmployeeSearchOptions implements SearchOptions {
 

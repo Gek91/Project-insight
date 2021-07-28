@@ -1,7 +1,7 @@
 package projectinsight.module.project.domain.project.model;
 
 
-import projectinsight.module.app.commons.uow.Entity;
+import projectinsight.module.app.commons.persistence.Entity;
 import projectinsight.module.app.commons.validations.ValidationErrorTypeEnum;
 import projectinsight.module.app.commons.validations.ValidationManager;
 
@@ -17,14 +17,14 @@ public class Project extends Entity<String> {
   protected String description;
   protected String customerId;
   protected ProjectTeam team;
-  protected SortedMap<String, ProjectVersion> versions;
+  protected List<ProjectVersion> versions;
 
   protected Instant creationInstant;
   protected Instant lastUpdateInstant;
   protected boolean deleted;
 
   public Project() {
-    versions = new TreeMap<>();
+    versions = new ArrayList<>();
   }
 
   public String getId() {
@@ -53,17 +53,16 @@ public class Project extends Entity<String> {
     return deleted;
   }
   public List<ProjectVersion> getVersions() {
-   return Collections.unmodifiableList(this.versions.values().stream().collect(Collectors.toList()));
+   return Collections.unmodifiableList(this.versions.stream().collect(Collectors.toList()));
   }
 
   public Optional<ProjectVersion> getLastActiveVersion() {
 
     int i = versions.size() - 1;
 
-    List<ProjectVersion> versionsList = getVersions();
-    while(i > 0) {
+    while(i >= 0) {
 
-      ProjectVersion version = versionsList.get(i);
+      ProjectVersion version = versions.get(i);
 
       if(version.getStatus().equals(ProjectVersionStatusEnum.RELEASED)) {
         return Optional.of(version);
@@ -77,19 +76,20 @@ public class Project extends Entity<String> {
 
   public void addProjectVersion(ProjectVersion newVersion) {
 
-    ValidationManager.build()
-      .validate(!this.versions.containsKey(newVersion.getProjectVersionString()), "version", ValidationErrorTypeEnum.INVALID)
-      .validate(isVersionsValuesConsistent(newVersion), "version", ValidationErrorTypeEnum.INVALID)
-      .throwValidationExceptionIfHasErrors();
+      ValidationManager.build()
+        .validate(!versions.stream().anyMatch(x -> x.getId().equals(newVersion.getId())), "version.id", ValidationErrorTypeEnum.INVALID)
+        .validate(!versions.stream().anyMatch(x -> x.getProjectVersionString().equals(newVersion.getProjectVersionString())), "version", ValidationErrorTypeEnum.INVALID)
+        .validate(isVersionsValuesConsistent(newVersion), "version", ValidationErrorTypeEnum.INVALID)
+        .throwValidationExceptionIfHasErrors();
 
-    this.versions.put(newVersion.getProjectVersionString(), newVersion);
+    insertNewVersion(newVersion);
 
     this.setUpdated();
   }
 
   private boolean isVersionsValuesConsistent(ProjectVersion newVersion) {
 
-    Optional<ProjectVersion> nextVersion = versions.values().stream().filter(x -> x.getProjectVersionString().compareTo(newVersion.getProjectVersionString()) > 0).findFirst();
+    Optional<ProjectVersion> nextVersion = versions.stream().filter(x -> x.getProjectVersionString().compareTo(newVersion.getProjectVersionString()) > 0).findFirst();
 
     if(nextVersion.isPresent()) {
       return nextVersion.get().releaseDate.compareTo(newVersion.releaseDate) >= 0;
@@ -97,11 +97,28 @@ public class Project extends Entity<String> {
     return true;
   }
 
-  public void removeProjectVersion(int major, int minor, int patch) {
+  private void insertNewVersion(ProjectVersion newVersion) {
+    Optional<ProjectVersion> nextVersion = versions.stream().filter(x -> x.getProjectVersionString().compareTo(newVersion.getProjectVersionString()) > 0).findFirst();
 
-    this.versions.remove(
-      ProjectVersion.buildProjectVersionString(major, minor, patch)
-    );
+    int index = 0;
+
+    for(; index < versions.size() ; index++) {
+
+      if(versions.get(index).getProjectVersionString().compareTo(newVersion.getProjectVersionString()) > 0) {
+        break;
+      }
+    }
+
+    versions.add(index, newVersion);
+  }
+
+  public void removeProjectVersion(String id) {
+
+    Optional<ProjectVersion> versionToRemoveOptional = this.versions.stream().filter(x -> x.getId().equals(id)).findFirst();
+
+    if(versionToRemoveOptional.isPresent()) {
+      this.versions.remove(versionToRemoveOptional.get());
+    }
 
     this.setUpdated();
   }

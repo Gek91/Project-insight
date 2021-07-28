@@ -1,8 +1,6 @@
 package projectinsight.module.project.rest.project;
 
-import projectinsight.module.project.rest.project.data.CreateProjectRequestDTO;
-import projectinsight.module.project.rest.project.data.ProjectDetailDTO;
-import projectinsight.module.project.rest.project.data.ProjectListDTO;
+import projectinsight.module.project.rest.project.data.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -23,4 +21,14 @@ public interface ProjectRestApi {
   @POST
   @Path("/")
   ProjectDetailDTO createProject(CreateProjectRequestDTO request);
+
+  @PUT
+  @Path("/{id}")
+  ProjectDetailDTO editProject(@PathParam("id") String id, EditProjectRequestDTO request);
+
+  @POST
+  @Path("/{id}/versions")
+  ProjectDetailDTO createProjectVersion(@PathParam("id") String id, CreateProjectVersionRequestDTO request);
+
+
 }

@@ -4,7 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import projectinsight.module.app.commons.BaseRestApiImpl;
 import projectinsight.module.app.commons.exception.EntityNotExistException;
-import projectinsight.module.app.commons.uow.UnitOfWork;
+import projectinsight.module.app.commons.persistence.UnitOfWork;
+import projectinsight.module.project.domain.customer.model.CustomerBuilder;
 import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.customer.model.Customer;
 import projectinsight.module.project.domain.customer.repository.CustomerSearchOptions;
@@ -23,6 +24,10 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
 
   @Inject
   private Provider<UnitOfWork> unitOfWorkProvider;
+
+  @Inject
+  private Provider<CustomerBuilder> customerBuilderProvider;
+
 
   @Override
   public CustomerListDTO getCustomerList() {
@@ -64,14 +69,13 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
       unitOfWork.beginUnitOfWorkTransaction();
 
       CustomerRepository customerRepository = (CustomerRepository) unitOfWork.getRepository(Customer.class);
+      ProjectRepository projectRepository = (ProjectRepository) unitOfWork.getRepository(Project.class);
 
       Customer customer = customerRepository.findForRead(id);
 
       if(customer == null) {
         throw new EntityNotExistException();
       }
-
-      ProjectRepository projectRepository = (ProjectRepository) unitOfWork.getRepository(Project.class);
 
       response = CustomerDetailDTO.buildDTO(customer, getCustomerProjects(projectRepository, customer.getId()));
 
@@ -104,9 +108,9 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
 
       unitOfWork.beginUnitOfWorkTransaction();
 
-      Customer customer = buildCustomerFromRequest(request);
-
       CustomerRepository customerRepository = (CustomerRepository) unitOfWork.getRepository(Customer.class);
+
+      Customer customer = buildCustomerFromRequest(request);
 
       customerRepository.add(customer);
 
@@ -123,7 +127,7 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
 
   private Customer buildCustomerFromRequest(CreateCustomerRequestDTO request) {
 
-    return Customer.getBuilder()
+    return customerBuilderProvider.get()
       .setName(request.getName())
       .buildCustomer();
   }
@@ -140,6 +144,7 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
       unitOfWork.beginUnitOfWorkTransaction();
 
       CustomerRepository customerRepository = (CustomerRepository) unitOfWork.getRepository(Customer.class);
+      ProjectRepository projectRepository = (ProjectRepository) unitOfWork.getRepository(Project.class);
 
       Customer customer = customerRepository.findForUpdate(id);
 
@@ -148,8 +153,6 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
       }
 
       editCustomerFromRequest(customer, request);
-
-      ProjectRepository projectRepository = (ProjectRepository) unitOfWork.getRepository(Project.class);
 
       response = CustomerDetailDTO.buildDTO(customer, getCustomerProjects(projectRepository, customer.getId()));
 
@@ -164,7 +167,7 @@ public class CustomerRestApiImpl extends BaseRestApiImpl implements CustomerRest
 
   public void editCustomerFromRequest(Customer customer, EditCustomerRequestDTO request) {
 
-    Customer.getBuilder()
+    customerBuilderProvider.get()
       .setName(request.getName())
       .setVersion(request.getCurrentVersion())
       .editCustomer(customer);

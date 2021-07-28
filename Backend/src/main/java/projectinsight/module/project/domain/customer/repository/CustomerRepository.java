@@ -1,7 +1,7 @@
 package projectinsight.module.project.domain.customer.repository;
 
 
-import projectinsight.module.app.commons.uow.Repository;
+import projectinsight.module.app.commons.persistence.Repository;
 import projectinsight.module.project.domain.customer.model.Customer;
 
 import java.util.List;

@@ -11,7 +11,6 @@ import com.google.inject.AbstractModule;
 import projectinsight.module.app.commons.RuntimeEnvironment;
 import projectinsight.module.app.commons.AppRuntimeEnvironment;
 import projectinsight.module.app.commons.provider.ExceptionMapperProvider;
-import projectinsight.module.app.commons.uow.UnitOfWork;
 import projectinsight.module.app.service.PersistenceService;
 import projectinsight.module.app.service.PropertiesService;
 import projectinsight.module.app.service.impl.PersistenceServiceImpl;

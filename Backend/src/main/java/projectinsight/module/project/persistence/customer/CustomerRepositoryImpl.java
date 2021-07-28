@@ -1,6 +1,8 @@
 package projectinsight.module.project.persistence.customer;
 
-import projectinsight.module.app.commons.uow.RepositoryAbstractImpl;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import projectinsight.module.app.commons.persistence.RepositoryAbstractImpl;
 import projectinsight.module.project.domain.customer.repository.CustomerRepository;
 import projectinsight.module.project.domain.customer.model.Customer;
 import projectinsight.module.project.domain.customer.repository.CustomerSearchOptions;
@@ -12,6 +14,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CustomerRepositoryImpl extends RepositoryAbstractImpl<String, Customer, CustomerSearchOptions> implements CustomerRepository {
+
+  @Inject
+  private Provider<CustomerMapper> customerMapperProvider;
 
   @Override
   protected String getFindForReadQuery() {
@@ -50,7 +55,7 @@ public class CustomerRepositoryImpl extends RepositoryAbstractImpl<String, Custo
 
   @Override
   protected Customer buildSingleEntityFromResultSet(ResultSet resultSet) {
-    return new CustomerMapper()
+    return customerMapperProvider.get()
       .setResultSetData(resultSet)
       .buildCustomer();
   }

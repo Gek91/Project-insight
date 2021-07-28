@@ -10,6 +10,7 @@ import projectinsight.module.app.commons.validations.rest.data.ValidationErrorsD
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import java.util.ConcurrentModificationException;
 
 @Provider
 public class ExceptionMapperProvider implements ExceptionMapper<Throwable> {
@@ -34,13 +35,8 @@ public class ExceptionMapperProvider implements ExceptionMapper<Throwable> {
       response = Response.status(DOCUMENT_INCONSISTENT_STATUS).build(); */
     } else if (exception instanceof EntityNotExistException) {
       response = Response.status(Response.Status.NOT_FOUND).build();
-    /*} else if (exception instanceof ConcurrentModifyException) {
-
-      ValidationErrorResponseDTO responseEntity = new ValidationErrorResponseDTO();
-      responseEntity.setValidationErrors(new ValidationErrorsDTO());
-      responseEntity.getValidationErrors().getList().add(new ValidationErrorDTO("CONCURRENCY_ERROR", null, null, null));
-      response = Response.status(Status.CONFLICT).entity(responseEntity).build();
-*/
+    } else if (exception instanceof ConcurrentModificationException) {
+      response = Response.status(Response.Status.CONFLICT).build();
     } else {
       logger.error("Thrown Exception", exception);
       response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

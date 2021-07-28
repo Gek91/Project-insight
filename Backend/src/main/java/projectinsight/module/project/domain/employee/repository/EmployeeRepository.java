@@ -1,7 +1,7 @@
 package projectinsight.module.project.domain.employee.repository;
 
 
-import projectinsight.module.app.commons.uow.Repository;
+import projectinsight.module.app.commons.persistence.Repository;
 import projectinsight.module.project.domain.employee.model.Employee;
 
 import java.util.List;

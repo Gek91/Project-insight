@@ -1,4 +1,4 @@
-package projectinsight.module.app.commons.uow;
+package projectinsight.module.app.commons.persistence;
 
 import java.time.Instant;
 

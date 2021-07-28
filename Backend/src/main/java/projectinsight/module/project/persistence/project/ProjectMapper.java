@@ -1,5 +1,7 @@
 package projectinsight.module.project.persistence.project;
 
+import projectinsight.module.project.domain.customer.repository.CustomerRepository;
+import projectinsight.module.project.domain.employee.repository.EmployeeRepository;
 import projectinsight.module.project.domain.project.model.Project;
 import projectinsight.module.project.domain.project.model.ProjectBuilder;
 import projectinsight.module.project.domain.project.model.ProjectVersion;
@@ -11,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ProjectMapper extends ProjectBuilder {
+
+  public ProjectMapper(EmployeeRepository employeeRepository, CustomerRepository customerRepository) {
+    super(employeeRepository, customerRepository);
+  }
 
   public ProjectMapper setResultSetData(ResultSet resultSet) {
 
